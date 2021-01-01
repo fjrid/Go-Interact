@@ -90,9 +90,11 @@ func (cmi *CmdInteract) Run() error {
 	if cmi.Silent {
 		stdout = newCapturingPassThroughWriter(&bytes.Buffer{})
 		stderr = newCapturingPassThroughWriter(&bytes.Buffer{})
+		cmd.Stdin = stdoutIn
 	} else {
 		stdout = newCapturingPassThroughWriter(os.Stdout)
 		stderr = newCapturingPassThroughWriter(os.Stderr)
+		cmd.Stdin = os.Stdin
 	}
 
 	err := cmd.Start()
