@@ -42,3 +42,14 @@ You will see the interactive result. If you want to hide the output, you can set
     command := interact.Initialize("ls", "-a", "-l")
     command.Silent = true
 ```
+
+## Features
+### Convert to String
+If you want to see complete command to string, you can easyly using `String()` function.
+```go
+    /*
+        command := interact.Initiate(command, ...arguments)
+    */
+    command := interact.Initialize("ls", "-a", "-l")
+    strCommand := command.String()
+```
