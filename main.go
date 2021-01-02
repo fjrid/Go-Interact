@@ -10,53 +10,6 @@ import (
 )
 
 /*
-	CmdInteract used for persisting config to run the exec.Command().
-	Other than that, this struct can be used for any configuration
-	for this package.
-*/
-type CmdInteract struct {
-	command string
-	args    []string
-
-	Silent bool
-
-	StdOut []byte
-	StdErr []byte
-}
-
-/*
-	This struct implementing io.Writer to storing current bytes
-*/
-type capturingPassThroughWriter struct {
-	buf bytes.Buffer
-	w   io.Writer
-}
-
-/*
-	Create new instance for capturingPassThroughWriter struct
-*/
-func newCapturingPassThroughWriter(w io.Writer) *capturingPassThroughWriter {
-	return &capturingPassThroughWriter{
-		w: w,
-	}
-}
-
-/*
-	Write method for writing buffer
-*/
-func (w *capturingPassThroughWriter) Write(d []byte) (int, error) {
-	w.buf.Write(d)
-	return w.w.Write(d)
-}
-
-/*
-	Bytes method for converting to the bytes
-*/
-func (w *capturingPassThroughWriter) Bytes() []byte {
-	return w.buf.Bytes()
-}
-
-/*
 	Initiate method for initialize CmdInteract, this method can be used for
 	initialize default configuration in package
 */
@@ -67,6 +20,10 @@ func Initiate(command string, args ...string) *CmdInteract {
 
 	cmdInteract.command = command
 	cmdInteract.args = args
+	cmdInteract.exec = exec.Command(
+		cmdInteract.command,
+		cmdInteract.args...,
+	)
 
 	return &cmdInteract
 }
@@ -75,10 +32,7 @@ func Initiate(command string, args ...string) *CmdInteract {
 	Run method for run the command configration
 */
 func (cmi *CmdInteract) Run() error {
-	cmd := exec.Command(
-		cmi.command,
-		cmi.args...,
-	)
+	cmd := cmi.exec
 
 	var errStdout, errStderr error
 
@@ -126,4 +80,11 @@ func (cmi *CmdInteract) Run() error {
 	cmi.StdErr = stderr.Bytes()
 
 	return nil
+}
+
+/*
+Convert command to string
+*/
+func (cmi *CmdInteract) String() string {
+	return cmi.exec.String()
 }
